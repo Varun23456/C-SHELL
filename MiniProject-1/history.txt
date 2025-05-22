@@ -1,0 +1,15 @@
+mkdir build
+seek -e build
+reveal
+seek
+reveal
+reveall
+reveala
+reveall -a
+echo 			"hello"
+echo 		"hello"
+
+echo				"hello"
+echo "hi" |
+ping 6826872 9
+cat display.c
