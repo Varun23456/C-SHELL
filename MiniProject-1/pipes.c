@@ -2,7 +2,7 @@
 
 void pipeline(char *temp, queue q, const char *home_dir, char *prev_dir, int flag)
 {
-    printf("%s\n",temp);
+    // printf("%s\n",temp); 
     int f1 = dup(STDIN_FILENO);
     int f2 = dup(STDOUT_FILENO);
     char input[1024];
