@@ -58,13 +58,13 @@ void seek_exe(char *name, char *path, int f, int d, int e)
         {
             if (flag1)
             {
-                print_colored_path(fullpath + sum + 1, 0);
+                print_colored_path(fullpath + sum + 1, 0);  // sum + 1 is to move the pointer to remove the base directory and print the ralative path './file.txt'
                 fcount++;
                 strncpy(found_file_path, fullpath, sizeof(found_file_path));
             }
             else if (flag2)
             {
-                print_colored_path(fullpath + sum + 1, 1);
+                print_colored_path(fullpath + sum + 1, 1);  // sum + 1 is to move the pointer to remove the base directory and print the ralative path './file.txt'
                 dcount++;
                 strncpy(found_dir_path, fullpath, sizeof(found_dir_path));
             }
