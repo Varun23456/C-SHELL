@@ -1,19 +1,19 @@
 
-# CSHELL - Custom Shell Implementation 🐚
+# CSHELL - Custom Shell Implementation
 
 A feature-rich Unix shell implementation built in C as part of the Operating Systems and Networks course. This shell provides essential command-line functionalities with custom built-in commands and advanced features like piping, redirection, and background process management.
 
 
-## ✨ Features
+## Features
 
-### 🔧 Core Shell Functionality
+### Core Shell Functionality
 - **Interactive Command Line**: Custom shell prompt with user and system information
 - **Command Parsing**: Robust tokenization and argument parsing
 - **Process Management**: Execute system commands with proper process handling
 - **Background Processes**: Support for running commands in background using `&`
 - **Signal Handling**: Proper handling of CTRL+C, CTRL+Z signals
 
-### 🚀 Advanced Features
+### Advanced Features
 - **Piping**: Chain multiple commands using `|` operator
 - **I/O Redirection**: 
   - Input redirection (`<`)
@@ -22,12 +22,12 @@ A feature-rich Unix shell implementation built in C as part of the Operating Sys
 - **Command History**: Persistent command history with search functionality
 - **Job Control**: Foreground and background job management
 
-### 📏 General Assumptions
+### General Assumptions
 - **Maximum Input Length**: 4096 characters
 - **Exit Command**: Entering `exit` as command will close the terminal
 - **Error Handling**: All errors are printed to stdout
 
-## 🛠️ Built-in Commands
+## Built-in Commands
 
 ### `hop [directory]` - Directory Navigation (Spec 3)
 Enhanced directory navigation command with support for multiple directories and previous directory tracking.
@@ -41,7 +41,7 @@ hop -                 # Go to previous directory
 hop dir1 dir2         # Navigate to multiple directories
 ```
 
-#### 🔍 Assumptions
+#### Assumptions
 - If `hop dir1 dir2` is given and `dir2` is invalid, directory will first change to `dir1` and then print error message for `dir2`
 - If only `hop` is given, it will directly go to home directory (where shell is invoked)
 - If `hop dir1 -` is given, it will return to the same directory it started
@@ -59,7 +59,7 @@ reveal -la /path       # Long format with hidden files
 reveal -              # Go to previous directory and list
 ```
 
-#### 🔍 Assumptions
+#### Assumptions
 - If `reveal -` is given as first prompt (i.e., `prev_dir` is not set), it will print warning "OLD_PWD not set"
 - Maximum number of entries in a directory is assumed to be 1024
 - If `reveal -l` is given, color change is reflected only on file/directory names
@@ -74,7 +74,7 @@ log purge             # Clear command history
 log execute <index>   # Execute command from history
 ```
 
-#### 🔍 Assumptions
+#### Assumptions
 - Erroneous commands will also get stored in log
 - Always an absolute path in the home directory is given to store commands in `history.txt` file
 - Any input having "log" as substring in it won't be stored even if it is a file name
@@ -88,7 +88,7 @@ proclore              # Show shell process info
 proclore 1234         # Show info for PID 1234
 ```
 
-#### 🔍 Assumptions
+#### Assumptions
 - If input has multiple foreground processes with execution time more than 2 seconds, then in the next prompt, it will display the most recent one
 - For an invalid background command, it will print PID and then 'execvp() failed' and 'exited normally'
 - Background won't work for custom functions. If given, it will print 'execvp() failed'
@@ -105,7 +105,7 @@ seek -f filename      # Search for file only
 seek -e pattern       # Execute if single match found
 ```
 
-#### 🔍 Assumptions
+#### Assumptions
 - All errors will be printed to stdout
 - Assuming filename only at the end of input
 
@@ -117,7 +117,7 @@ Display all currently running background processes with their status.
 activities            # Show background processes
 ```
 
-#### 🔍 Assumptions
+#### Assumptions
 - If an error command is executed, it will still be stored in activities
 
 ### `ping <pid> <signal_number>` - Signal Management
@@ -138,7 +138,7 @@ fg 1234              # Bring PID 1234 to foreground
 bg 1234              # Send PID 1234 to background
 ```
 
-#### 🔍 Assumptions
+#### Assumptions
 - If `sleep 5` is in foreground, then after 5 seconds only Ctrl+D will be accepted and then terminal closes
 - After converting background to foreground, if it takes more than 2 seconds, prompt will change
 
@@ -150,7 +150,7 @@ Display information about newborn processes.
 neonate -n           # Show process information
 ```
 
-#### 🔍 Assumptions
+#### Assumptions
 - If neonate with time interval is given, it will print "invalid command"
 
 ### `iMan <command>` - Manual Pages
@@ -162,7 +162,7 @@ iMan ls              # Show manual for ls command
 iMan grep            # Show manual for grep command
 ```
 
-## 🔧 Advanced Features
+## Advanced Features
 
 ### Piping (Spec 11)
 Chain multiple commands using the `|` operator for inter-process communication.
@@ -173,7 +173,7 @@ ls -la | grep "txt"
 cat file.txt | sort | uniq
 ```
 
-#### 🔍 Assumptions
+#### Assumptions
 - Assuming `hop .. | wc` won't change the directory but will count words from the output of `hop ..`
 
 ### I/O Redirection (Spec 12)
@@ -186,7 +186,7 @@ cat < input.txt > output.txt
 command >> append.txt
 ```
 
-#### 🔍 Assumptions
+#### Assumptions
 - If `&` is given, it will do background only for the preceding command
 
 ### Background Processes
@@ -201,7 +201,7 @@ long_running_command &
 ### Signal Handling (Spec 14)
 Proper handling of CTRL+C, CTRL+Z, and CTRL+D signals.
 
-#### 🔍 Assumptions
+#### Assumptions
 - If Ctrl+C is given when no foreground processes are running, it will remain on the same line and still accept input (not new prompt)
 - If Ctrl+D is given, then it will print all the PIDs and print them as killed
 
@@ -231,7 +231,7 @@ gcc -o cshell main.c execute.c hop.c reveal.c log.c proclore.c seek.c activities
 ```
 
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 cshell/
@@ -290,7 +290,7 @@ fg 1234
 ```
 
 
-## 🐛 Known Issues and Limitations
+## Known Issues and Limitations
 
 ### Current Limitations
 * Signal handling might need refinement for some edge cases
