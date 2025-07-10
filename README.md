@@ -1,88 +1,304 @@
-# C-SHELL Assumptions
 
-## General
- Max length of input is 4096.  
+# CSHELL - Custom Shell Implementation 🐚
 
- Entering exit as command will close the terminal.
-
-## spec - 3
-
- If hop dir1 dir2 is given and dir2 are invalid, directory will first change to dir1 and then prints error message for dir2.
-
- If only hop is given,it will directly go to home directory i.e where shell is invoked.
-
- IF 'hop dir1 -' is given,it will return to same directory it started.
-
- Only hop - will work.Not handled 'hop -/dir' cases.
+A feature-rich Unix shell implementation built in C as part of the Operating Systems and Networks course. This shell provides essential command-line functionalities with custom built-in commands and advanced features like piping, redirection, and background process management.
 
 
-## spec - 4
+## ✨ Features
 
- If reveal - as first prompt(i.e prev_dir is not set),It will print a warning "OLD_PWD not set".
+### 🔧 Core Shell Functionality
+- **Interactive Command Line**: Custom shell prompt with user and system information
+- **Command Parsing**: Robust tokenization and argument parsing
+- **Process Management**: Execute system commands with proper process handling
+- **Background Processes**: Support for running commands in background using `&`
+- **Signal Handling**: Proper handling of CTRL+C, CTRL+Z signals
 
- Assuming Max no.of entries in a directory is 1024.
+### 🚀 Advanced Features
+- **Piping**: Chain multiple commands using `|` operator
+- **I/O Redirection**: 
+  - Input redirection (`<`)
+  - Output redirection (`>`, `>>`)
+  - Error redirection (`2>`)
+- **Command History**: Persistent command history with search functionality
+- **Job Control**: Foreground and background job management
 
- If reveal -l is given,the colour change is reflected only on file/dir name.
+### 📏 General Assumptions
+- **Maximum Input Length**: 4096 characters
+- **Exit Command**: Entering `exit` as command will close the terminal
+- **Error Handling**: All errors are printed to stdout
+
+## 🛠️ Built-in Commands
+
+### `hop [directory]` - Directory Navigation (Spec 3)
+Enhanced directory navigation command with support for multiple directories and previous directory tracking.
+
+#### Usage
+```bash
+hop                    # Go to home directory
+hop ..                 # Go to parent directory
+hop /path/to/dir      # Go to specified directory
+hop -                 # Go to previous directory
+hop dir1 dir2         # Navigate to multiple directories
+```
+
+#### 🔍 Assumptions
+- If `hop dir1 dir2` is given and `dir2` is invalid, directory will first change to `dir1` and then print error message for `dir2`
+- If only `hop` is given, it will directly go to home directory (where shell is invoked)
+- If `hop dir1 -` is given, it will return to the same directory it started
+- Only `hop -` will work. Not handling `hop -/dir` cases
+
+### `reveal [flags] [path]` - Directory Listing (Spec 4)
+Display directory contents with various formatting options and color-coded output.
+
+#### Usage
+```bash
+reveal                 # List current directory
+reveal -l              # Long format listing
+reveal -a              # Show hidden files
+reveal -la /path       # Long format with hidden files
+reveal -              # Go to previous directory and list
+```
+
+#### 🔍 Assumptions
+- If `reveal -` is given as first prompt (i.e., `prev_dir` is not set), it will print warning "OLD_PWD not set"
+- Maximum number of entries in a directory is assumed to be 1024
+- If `reveal -l` is given, color change is reflected only on file/directory names
+
+### `log [subcommand]` - Command History (Spec 5)
+Command history management with persistent storage and execution capabilities.
+
+#### Usage
+```bash
+log                    # Show command history (last 15 commands)
+log purge             # Clear command history
+log execute <index>   # Execute command from history
+```
+
+#### 🔍 Assumptions
+- Erroneous commands will also get stored in log
+- Always an absolute path in the home directory is given to store commands in `history.txt` file
+- Any input having "log" as substring in it won't be stored even if it is a file name
+
+### `proclore [pid]` - Process Information (Spec 6)
+Display detailed process information with execution time tracking for foreground processes.
+
+#### Usage
+```bash
+proclore              # Show shell process info
+proclore 1234         # Show info for PID 1234
+```
+
+#### 🔍 Assumptions
+- If input has multiple foreground processes with execution time more than 2 seconds, then in the next prompt, it will display the most recent one
+- For an invalid background command, it will print PID and then 'execvp() failed' and 'exited normally'
+- Background won't work for custom functions. If given, it will print 'execvp() failed'
+- Maximum number of background processes that can be handled is 1024
+
+### `seek [flags] [target] [search_directory]` - File Search (Spec 10)
+Advanced file and directory search with various filtering options.
+
+#### Usage
+```bash
+seek file.txt         # Search for file.txt
+seek -d dirname       # Search for directory
+seek -f filename      # Search for file only
+seek -e pattern       # Execute if single match found
+```
+
+#### 🔍 Assumptions
+- All errors will be printed to stdout
+- Assuming filename only at the end of input
+
+### `activities` - Background Process Management (Spec 13)
+Display all currently running background processes with their status.
+
+#### Usage
+```bash
+activities            # Show background processes
+```
+
+#### 🔍 Assumptions
+- If an error command is executed, it will still be stored in activities
+
+### `ping <pid> <signal_number>` - Signal Management
+Send signals to processes for job control.
+
+#### Usage
+```bash
+ping 1234 9          # Send SIGKILL to PID 1234
+ping 1234 15         # Send SIGTERM to PID 1234
+```
+
+### `fg <pid>` / `bg <pid>` - Job Control (Spec 15)
+Bring background processes to foreground or vice versa.
+
+#### Usage
+```bash
+fg 1234              # Bring PID 1234 to foreground
+bg 1234              # Send PID 1234 to background
+```
+
+#### 🔍 Assumptions
+- If `sleep 5` is in foreground, then after 5 seconds only Ctrl+D will be accepted and then terminal closes
+- After converting background to foreground, if it takes more than 2 seconds, prompt will change
+
+### `neonate [flags]` - Process Information (Spec 16)
+Display information about newborn processes.
+
+#### Usage
+```bash
+neonate -n           # Show process information
+```
+
+#### 🔍 Assumptions
+- If neonate with time interval is given, it will print "invalid command"
+
+### `iMan <command>` - Manual Pages
+Fetch and display manual pages for commands.
+
+#### Usage
+```bash
+iMan ls              # Show manual for ls command
+iMan grep            # Show manual for grep command
+```
+
+## 🔧 Advanced Features
+
+### Piping (Spec 11)
+Chain multiple commands using the `|` operator for inter-process communication.
+
+#### Usage
+```bash
+ls -la | grep "txt"
+cat file.txt | sort | uniq
+```
+
+#### 🔍 Assumptions
+- Assuming `hop .. | wc` won't change the directory but will count words from the output of `hop ..`
+
+### I/O Redirection (Spec 12)
+Redirect input and output using `<`, `>`, and `>>` operators.
+
+#### Usage
+```bash
+echo "Hello" > file.txt
+cat < input.txt > output.txt
+command >> append.txt
+```
+
+#### 🔍 Assumptions
+- If `&` is given, it will do background only for the preceding command
+
+### Background Processes
+Execute commands in the background using the `&` operator.
+
+#### Usage
+```bash
+sleep 100 &
+long_running_command &
+```
+
+### Signal Handling (Spec 14)
+Proper handling of CTRL+C, CTRL+Z, and CTRL+D signals.
+
+#### 🔍 Assumptions
+- If Ctrl+C is given when no foreground processes are running, it will remain on the same line and still accept input (not new prompt)
+- If Ctrl+D is given, then it will print all the PIDs and print them as killed
+
+##  Installation
+
+### Prerequisites
+- GCC compiler
+- Linux/Unix environment
+- Make utility
+
+### Build Instructions
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/cshell.git
+cd cshell
+
+# Compile the shell
+make
+
+# Run the shell
+./cshell
+```
+
+### Manual Compilation
+```bash
+gcc -o cshell main.c execute.c hop.c reveal.c log.c proclore.c seek.c activities.c signals.c fg_bg.c neonate.c iMan.c pipes.c redirection.c token.c queue.c display.c -lm
+```
 
 
-## spec - 5
+## 📁 Project Structure
 
- Erroneous commands will also get stored in log.
+```
+cshell/
+├── main.c              # Main shell loop and initialization
+├── execute.c           # Command execution logic
+├── execute.h           # Execution function declarations
+├── hop.c               # Directory navigation implementation
+├── hop.h               # Hop function declarations
+├── reveal.c            # Directory listing implementation
+├── reveal.h            # Reveal function declarations
+├── proclore.c          # Process information display
+├── proclore.h          # Proclore function declarations
+├── seek.c              # File search implementation
+├── seek.h              # Seek function declarations
+├── activities.c        # Background process management
+├── activities.h        # Activities function declarations
+├── signals.c           # Signal handling implementation
+├── signals.h           # Signal handling declarations
+├── fg_bg.c             # Foreground/background job control
+├── fg_bg.h             # Job control declarations
+├── neonate.c           # Newborn process information
+├── neonate.h           # Neonate function declarations
+├── iMan.c              # Manual page fetcher
+├── iMan.h              # iMan function declarations
+├── pipes.c             # Pipe implementation
+├── pipes.h             # Pipe function declarations
+├── redirection.c       # I/O redirection implementation
+├── redirection.h       # Redirection function declarations
+├── token.c             # Command tokenization
+├── token.h             # Tokenization declarations
+├── queue.c             # Queue data structure for processes
+├── queue.h             # Queue declarations
+├── display.c           # Display and formatting utilities
+├── display.h           # Display function declarations
+├── history.txt         # Command history storage
+├── .myshrc             # Shell configuration file
+├── makefile            # Build configuration
+└── README.md           # This file
+```
+##  Examples
 
- Always an absolute path in the home directory is given to store commands in history.txt file.
+### Complex Command Combinations
+```bash
+# Multiple pipes with redirection
+ls -la | grep "txt" | sort > sorted_files.txt
 
- Any input having "log" as substring in it wont be stored even if it is a file name.
+# Background process with redirection
+sleep 100 > /dev/null 2>&1 &
 
- 
-## spec - 6
+# Search and execute
+seek -e "main.c" ./src
 
- If Input has multple foreground process with execution time more than 2 sec,
- then in the next prompt,it will display the most recent one.
-
- For an Invalid background command, it will just print pid and then 'execvp() failed' and 'exited normally'.
-
- Background wont work for custom functions.If given it will print Execvp() failed.
-
- Max number of background process that can be done 1024.
-
-
-## spec -10
-
- All the error will be printed to stdout.
-
- Assuming Filename only at the end of input.
-
-## spec - 11
-
- Assuming hop .. | wc wont change the directory.will count the words from the output of hop ..
-
-## spec - 12
-
- If & is given it will do background only for the preceding command. 
-
-## spec - 13
- 
- If error command is happened,still it will be stored in activties.
-
-## spec - 14
- 
- If ctrcl + c is given when no foreground process are running then ,it will remain in same line and still accept input.(not new prompt)
-
- If ctrl + d is given,then it will print all the pids and print them as killed.
-
-## spec - 15
-
- If sleep 5 is in foreground then after 5 sec only ctrl + d will be accepted and then terminal closes.
-
- After converting background to foreground from them if it takes more than 2 seconds prompt will change.
-
-
-## spec - 16
-
- If neonate with time interval is given ,it will print invalid command.
-
-
-
-
+# Process management
+ping 1234 15
+fg 1234
+```
 
 
+## 🐛 Known Issues and Limitations
+
+### Current Limitations
+* Signal handling might need refinement for some edge cases
+* Tab completion is not implemented
+* Some built-in commands may need additional error checking
+* Background processes don't work for custom functions
+
+## Edge Cases
+* Complex directory navigation patterns may not be fully supported
+* Error handling for invalid process IDs needs improvement
+* Memory management in case of very long command chains
